@@ -10,16 +10,16 @@ class Variable{
 private:
     string name;
     int value;
-    string linkedVariable;
+    // string linkedVariable;
 public:
     Variable();
     Variable(string name_v, int val);
-    Variable(string name_v, int val, string lv);
+    // Variable(string name_v, int val, string lv);
     Variable(string name_v);
     void setValue (int val);
     string getName();
     int getValue ();
-    string getLinkedVariable();
+    // string getLinkedVariable();
     int equal(Variable v) const;
 };
 

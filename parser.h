@@ -34,12 +34,12 @@ public:
     vector<string> splitContentFromFile(string filename);
     vector<string> splitContent(const string& content);
     int findInt (string content);
-    Variable parserVariable (Node* content);
+    // Variable parserVariable (Node* content);
     Variable parserVariable ();
-    vector<Variable> parserVariablesRegs ();
+    vector<Variable> parserVariables ();
     Variable getVariable(vector<Variable> variables, string name);
-    Ins parserInstruction(vector<Variable> variables, vector<Variable> regs);
-    Message parserMessage(int id, vector<Variable> variables, vector<Variable> regs);
+    Ins parserInstruction(vector<Variable> variables);
+    Message parserMessage(int id, vector<Variable> variables);
     Handler parserHandler (int id,  vector<Variable> variables);
     Handlers parserProgram ();
     Name getNameFromString(string name);

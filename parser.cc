@@ -124,38 +124,39 @@ int Parser::findInt (string content){
     return stoi(integer);
 }
 
-Variable Parser::parserVariable (Node* contents){
-    //cout << contents->word << endl;
-    string name = contents->word;
-    contents = contents->next;
-    //cout << contents->word << endl;
-    contents = contents->next;
-    //cout << contents->word << endl;
-    int value = stoi(contents->word);
-    //printf("%d\n", value);
-    return Variable(name,value);
-}
+// Variable Parser::parserVariable (Node* contents){
+//     //cout << contents->word << endl;
+//     string name = contents->word;
+//     contents = contents->next;
+//     //cout << contents->word << endl;
+//     contents = contents->next;
+//     //cout << contents->word << endl;
+//     int value = stoi(contents->word);
+//     //printf("%d\n", value);
+//     return Variable(name,value);
+// }
 
 Variable Parser::parserVariable (){
     //cout << contents->word << endl;
     string name = contents->word;
     contents = contents->next;
-    // cout << contents->word << endl;
+    //cout << name << endl;
     contents = contents->next;
     // cout << contents->word << endl;
     int value = stoi(contents->word);
+    //printf("%d\n", value);
     contents = contents->next;
     return Variable(name,value);
 }
 
-vector<Variable> Parser::parserVariablesRegs (){
+vector<Variable> Parser::parserVariables (){
     vector<Variable> variables;
     int enter = 0;
     while (contents->word != "end"){
         if (contents->word == "begin"){
             enter = 1;
         }else if(enter){
-            variables.push_back(Variable(parserVariable()));
+            variables.push_back(parserVariable());
         }
         //cout << contents->word << endl;
         contents = contents->next;
@@ -174,7 +175,7 @@ Variable Parser::getVariable(vector<Variable> variables, string name){
     return Variable();
 }
 
-Ins Parser::parserInstruction(vector<Variable> variables, vector<Variable> regs){
+Ins Parser::parserInstruction(vector<Variable> variables){
     int label = stoi(contents->word);
     contents = contents->next;
     Ins instruction;
@@ -187,10 +188,10 @@ Ins Parser::parserInstruction(vector<Variable> variables, vector<Variable> regs)
             instruction = Ins (W, v, value, label);
         } else if (contents->word == "Read" ){
             contents = contents->next;
-            Variable v1 = getVariable (variables, contents->word);
+            Variable v = getVariable (variables, contents->word);
             contents = contents->next;
-            Variable v2 = getVariable (regs, contents->word);
-            instruction = Ins (R, v1, v2, label);
+            int value = stoi(contents->word);
+            instruction = Ins (R, v, value, label);
         } else if (contents->word == "Post"){
             contents = contents->next;
             int id_h = findInt(contents->word);
@@ -203,14 +204,14 @@ Ins Parser::parserInstruction(vector<Variable> variables, vector<Variable> regs)
     return instruction;
 }
 
-Message Parser::parserMessage (int id, vector<Variable> variables, vector<Variable> regs){
+Message Parser::parserMessage (int id, vector<Variable> variables){
     Message message(id);
     int enter = 0;
     while (contents->word != "end"){
         if (contents->word == "begin"){
             enter = 1;
         }else if(enter){
-            message.addInstruction(parserInstruction(variables, regs));
+            message.addInstruction(parserInstruction(variables));
         }
         contents = contents->next;
     }
@@ -219,22 +220,22 @@ Message Parser::parserMessage (int id, vector<Variable> variables, vector<Variab
 
 Handler Parser::parserHandler (int id, vector<Variable> variables){
     Handler handler(id);
-    vector<Variable> regs;
-    int enterRegs = 0; 
+    // vector<Variable> regs;
+    // int enterRegs = 0; 
     int enterMessage= 0;
     while (contents->word != "end"){
-        if (contents->word == "Regs"){
-            enterRegs = 1;
-        }else if (enterRegs){
-            regs = parserVariablesRegs ();
-            handler.setRegs(regs);
-            enterRegs = 0;
-        }
+        // if (contents->word == "Regs"){
+        //     enterRegs = 1;
+        // }// else if (enterRegs){
+        //     regs = parserVariables ();
+        //     // handler.setRegs(regs);
+        //     enterRegs = 0;
+        // }
         if (contents->word == "begin"){
             enterMessage = 1;
         }else if(enterMessage){
             int id_m = findInt (contents->word);
-            handler.addMessage(parserMessage(id_m, variables, regs));
+            handler.addMessage(parserMessage(id_m, variables));
         }
         contents = contents->next;
     }
@@ -250,7 +251,7 @@ Handlers Parser::parserProgram (){
         if (contents->word == "Vars"){
             enterVars = 1;
         }else if (enterVars){
-            variables = parserVariablesRegs ();
+            variables = parserVariables ();
             handlers.setVariables(variables);
             enterVars = 0;
         }
@@ -316,7 +317,7 @@ Order Parser::parserOrder(Name type, Handlers handlers){
                 Message message2 = handlers.getMessage(instruction2);
                 // printf("break\n");
                 if (type == CO || type == RF){
-                    Variable variable = instruction1.getSharedVariable(instruction2);
+                    Variable variable = instruction1.getVariable();
                     Relation newRelation(message1, instruction1, message2, instruction2, variable);
                     o.addRelation(newRelation);
                 } else {

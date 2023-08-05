@@ -23,7 +23,7 @@ public:
 
     Ins(Type t, Variable var, int value, int l); //Write
 
-    Ins(Type t, Variable var, Variable v, int l); //Read
+    // Ins(Type t, Variable var, Variable v, int l); //Read
 
     Ins(Type t, int h, int m, int l); //Post
 
@@ -57,7 +57,7 @@ public:
     int getId_m() const { return id_m; }
     int getLabel() const {return label;}
     int equal(Ins instruction) const;
-    Variable getSharedVariable(Ins instruction);
+    // Variable getSharedVariable(Ins instruction);
 };
 
 #endif

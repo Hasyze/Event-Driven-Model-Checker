@@ -248,7 +248,9 @@ void Handlers::addExecutionRelation (Order* eo, Order order, Handler handler, Me
             }
             printf("%d\n", labelSource);
             printf("%d\n", labelDestination);
-            if (labelSource < labelDestination && source.getVariable().equal(destination.getVariable())){
+            printf("value s: %d\n", source.getVariable().getValue());
+            printf("value d: %d\n", destination.getVariable().getValue());
+            if (labelSource < labelDestination && source.getVariable().getName()==destination.getVariable().getName()){
                 printf("Yes\n");
                 Relation newRelation (source.getMessage2(),destination.getMessage1());
                 eo->addRelation(newRelation);
