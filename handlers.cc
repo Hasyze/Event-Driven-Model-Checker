@@ -7,6 +7,8 @@ Handlers::Handlers(){}
 
 Handlers::Handlers (vector<Handler> h): handlers(h), variables({}), orders({}) {}
 
+Handlers::Handlers (vector<Variable> v):  handlers({}), variables(v), orders({}){}
+
 Handlers::Handlers (vector<Handler> h, vector<Variable> v): handlers(h), variables(v), orders({})  {}
 
 Handlers::Handlers (vector<Handler> h, vector<Variable> v,  vector<Order> ord):  handlers(h), variables(v), orders(ord)  {}
@@ -107,6 +109,16 @@ Message Handlers::getMessage(Ins instruction) const{
         }
     }
     exit (0);
+}
+
+vector<Message> Handlers::getMessages(Ins instruction) const{
+    vector<Message> messages;
+    for (const Handler& h : handlers){
+        if(h.existMessage(instruction)){
+            messages.push_back(h.getMessage(instruction));
+        }
+    }
+    return messages;
 }
 
 Ins Handlers::getInstruction (int label) const{

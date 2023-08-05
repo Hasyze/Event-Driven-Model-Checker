@@ -20,6 +20,10 @@ int Ins::equal(Ins instruction) const{
         return 0;
 }
 
+void Ins::addLabel(int l){
+    label = l;
+}
+
 // Variable Ins::getSharedVariable(Ins instruction){
 //     if (type == W){
 //         return variable;

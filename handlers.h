@@ -21,6 +21,7 @@ private:
 public:
     Handlers ();
     Handlers (vector<Handler> h);
+    Handlers (vector<Variable> v);
     Handlers (vector<Handler> h, vector<Variable> v);
     Handlers (vector<Handler> h, vector<Variable> v, vector<Order> ord);
     vector<Handler> getHandlers()const;
@@ -39,6 +40,7 @@ public:
     Handler getHandler(Message m) const;
     Message getMessage(int id) const;
     Message getMessage(Ins instruction) const;
+    vector<Message> getMessages(Ins instruction) const;
     Ins getInstruction (int label) const;
     Order getExecutionOrderHandler (Handler h);
     void conflictOrder ();

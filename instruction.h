@@ -57,6 +57,7 @@ public:
     int getId_m() const { return id_m; }
     int getLabel() const {return label;}
     int equal(Ins instruction) const;
+    void addLabel(int l);
     // Variable getSharedVariable(Ins instruction);
 };
 

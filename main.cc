@@ -12,6 +12,72 @@
 #include <ctime>
 using namespace std;
 
+vector<Ins> generateWriteInstructions (vector<Variable> variables){
+    srand(time(nullptr));
+    vector <Ins> instructions;
+    int numberInstructions = 1 + rand() % 20;
+    for (int i = 0; i<numberInstructions; i++){
+        Variable variable = variables[rand()%variables.size()];
+        Ins instruction(W, variable, rand());
+        instructions.push_back(instruction);
+    }
+    return instructions;
+}
+
+vector<Ins> generateReadInstructions (vector<Ins> writeInstructions){
+    vector<Ins> instructions;
+    for (const Ins& ins: writeInstructions){
+        Ins instruction(R, ins.getVariable(), ins.getVariable().getValue());
+        instructions.push_back(instruction);
+    }
+    return instructions;
+}
+
+int label = 0;
+
+vector<Ins> generateInstructions (vector<Ins> writeInstructions, vector<Ins> readInstructions){
+    srand(time(nullptr));
+    int numberInstructions = 1 + rand () % 10;
+    vector<Ins> instructions;
+    for (int i = 0 ; i< numberInstructions; i++){
+        if (rand()%2 == 0){ //Post
+            Ins instruction(P, 1 + rand()%10, 1 + rand()%10, label);
+            instructions.push_back(instruction);
+        } else { //Write or Read
+            int index = rand() % writeInstructions.size();
+            if (rand()%2 == 0){ // Write
+                Ins instruction = writeInstructions[index];
+                instruction.addLabel(label);
+                instructions.push_back(instruction);
+            } else { //Read
+                Ins instruction = readInstructions[index];
+                instruction.addLabel(label);
+                instructions.push_back(instruction);
+            }
+        }
+        label ++;
+    }
+    return instructions;
+}
+
+int idMessage = 0;
+
+Message generateMessage (vector<Ins> writeInstructions, vector<Ins> readInstructions){
+    Message message(idMessage, generateInstructions(writeInstructions,readInstructions));
+    idMessage++;
+    return message;
+}
+
+Handler generateHandler(int id, vector<Ins> writeInstructions, vector<Ins> readInstructions){
+    srand(time(nullptr));
+    int numberMessages = 1 +rand() % 10;
+    Handler handler(id);
+    for (int i = 0 ; i<numberMessages; i++){
+        handler.addMessage(generateMessage(writeInstructions,readInstructions));
+    }
+    return handler;
+}
+
 string generateRandomName(int length) {
     string valid_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     int num_chars = valid_chars.length();
@@ -26,6 +92,52 @@ string generateRandomName(int length) {
 
     return random_name;
 }
+
+Handlers generateHandlers(){
+    srand(time(nullptr));
+    int numberVariables = 1 + rand() % 5;
+    vector<Variable> variables;
+    for (int i = 0; i < numberVariables; i++){
+        int length = 1 + rand() % (1+i);
+        Variable variable(generateRandomName(length), 0);
+        variables.push_back(variable);
+    }
+    vector<Ins> writeInstructions = generateWriteInstructions(variables);
+    vector<Ins> readInstructions = generateReadInstructions(writeInstructions);
+    Handlers handlers(variables);
+    int numberHandlers = 1 + rand() % 10;
+    for (int i=0;i<numberHandlers; i++){
+        handlers.addHandler(generateHandler(i, writeInstructions, readInstructions ));
+    }
+    Order rf(RF);
+    for (vector<Ins>::size_type i = 0; i<writeInstructions.size(); i++){
+        vector<Message> writeMessages = handlers.getMessages(writeInstructions[i]);
+        vector<Message> readMessages = handlers.getMessages(readInstructions[i]);
+        for (const Message& writeMessage: writeMessages){
+            for (const Message& readMessage: readMessages){
+                Relation newRelation(writeMessage, writeInstructions[i],readMessage, readInstructions[i], writeInstructions[i].getVariable());
+                rf.addRelation(newRelation);
+            }
+        }
+    }
+    handlers.addOrder(rf);
+    return handlers;
+}
+
+// string generateRandomName(int length) {
+//     string valid_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+//     int num_chars = valid_chars.length();
+
+//     string random_name;
+//     srand(time(nullptr));
+
+//     for (int i = 0; i < length; i++) {
+//         int random_index = rand() % num_chars;
+//         random_name += valid_chars[random_index];
+//     }
+
+//     return random_name;
+// }
 
 // Handlers generateProgram (){
 //     srand(time(nullptr));
