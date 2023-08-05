@@ -27,7 +27,7 @@ string generateRandomName(int length) {
     return random_name;
 }
 
-void generateProgram (){
+Handlers generateProgram (){
     srand(time(nullptr));
     int numberHandlers = 1 + rand() % 10;
     int numberVariables = 1 + rand() % 5;
@@ -38,6 +38,8 @@ void generateProgram (){
         variables.push_back(variable);
     }
     vector<Handler> handlers;
+    int messageId = 0;
+    int label = 0;
     for (int i=0 ; i!=numberHandlers; i++){
         int numberMessages = 1 + rand() % 10;
         vector<Message> messages;
@@ -50,21 +52,31 @@ void generateProgram (){
                     int variableIndex = rand() % numberVariables;
                     Variable variable = variables[variableIndex];
                     int value = rand() % 100;
-                    Ins instruction (W, variable, value, k);
+                    Ins instruction (W, variable, value, label);
+                    instructions.push_back(instruction);
                 } else if (opearation == 1) {//Read
                     int variableRead = rand() % numberVariables;
                     Variable variable = variables[variableRead];
                     int length = 1 + rand() % 3;
                     Variable localVariable(generateRandomName(length), 0);
-                    Ins instruction (R, localVariable, variable, k);
+                    Ins instruction (R, localVariable, variable, label);
+                    instructions.push_back(instruction);
                 }else{ //Post
                     int idHandler = 1 + rand() % numberHandlers;
                     int idMessage = 1+ rand () % 10;
-                    Ins instruction (P, idHandler, idMessage, k);
+                    Ins instruction (P, idHandler, idMessage, label);
+                    instructions.push_back(instruction);
                 }
+                label ++;
             }
+            Message m(messageId, instructions);
+            messages.push_back(m);
+            messageId ++;
         }
+        Handler h(i,messages);
+        handlers.push_back(h);
     }
+    return Handlers(handlers,variables);
 }
 
 int main(int argc, char** argv){
