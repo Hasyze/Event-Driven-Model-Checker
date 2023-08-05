@@ -16,7 +16,7 @@ string generateRandomName(int length) {
     string valid_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     int num_chars = valid_chars.length();
 
-    tring random_name;
+    string random_name;
     srand(time(nullptr));
 
     for (int i = 0; i < length; i++) {
@@ -46,19 +46,21 @@ void generateProgram (){
             vector<Ins> instructions;
             for (int k=0 ; k!=numberInstructions;k++){
                 int opearation = rand() % 3;
-                switch (opearation){
-                    case 0: //Write
-                        int variableIndex = rand() % numberVariables;
-                        Variable variable = variables[i];
-                        int value = rand() % 100;
-                        Ins instruction (W, variable, value, k);
-                        break;
-                    case 1: //Read
-                        Ins instruction = 
-                        break;
-                    case 2: //Post
-                        Ins instruction = 
-                        break;
+                if (opearation == 0){
+                    int variableIndex = rand() % numberVariables;
+                    Variable variable = variables[variableIndex];
+                    int value = rand() % 100;
+                    Ins instruction (W, variable, value, k);
+                } else if (opearation == 1) {//Read
+                    int variableRead = rand() % numberVariables;
+                    Variable variable = variables[variableRead];
+                    int length = 1 + rand() % 3;
+                    Variable localVariable(generateRandomName(length), 0);
+                    Ins instruction (R, localVariable, variable, k);
+                }else{ //Post
+                    int idHandler = 1 + rand() % numberHandlers;
+                    int idMessage = 1+ rand () % 10;
+                    Ins instruction (P, idHandler, idMessage, k);
                 }
             }
         }
