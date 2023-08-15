@@ -252,18 +252,20 @@ void Handlers::addExecutionRelation (Order* eo, Order order, Handler handler, Me
     //printf("orders destinations: %ld\n\n", destinations.size());
     for (const Relation& source: sources){
         for(const Relation& destination: destinations){
+            // printf("message source id: %d\n", source.getMessage1().getId());
+            // printf("message destination id: %d\n", destination.getMessage1().getId());
             int labelSource = source.getInstruction1().getLabel();
             int labelDestination = destination.getInstruction2().getLabel();
             if (labelSource > labelDestination){
                 Relation newRelation (destination.getMessage1(),source.getMessage2());
                 eo->addRelation(newRelation);
             }
-            printf("%d\n", labelSource);
-            printf("%d\n", labelDestination);
-            printf("value s: %d\n", source.getVariable().getValue());
-            printf("value d: %d\n", destination.getVariable().getValue());
+            // printf("%d\n", labelSource);
+            // printf("%d\n", labelDestination);
+            // printf("value s: %d\n", source.getVariable().getValue());
+            // printf("value d: %d\n", destination.getVariable().getValue());
             if (labelSource < labelDestination && source.getVariable().getName()==destination.getVariable().getName()){
-                printf("Yes\n");
+                // printf("Yes\n");
                 Relation newRelation (source.getMessage2(),destination.getMessage1());
                 eo->addRelation(newRelation);
             }
@@ -335,7 +337,7 @@ void Handlers::executionOrder() {
         }
     }
     printf("orders eo: %d\n", eo.relationsNumber());
-    if (numberExecutionOrder() != eo.relationsNumber()){
+    //if (numberExecutionOrder() != eo.relationsNumber()){
         for (const Handler& h: handlers){
             for (const Handler& handler: handlers){
                 if(h.getId() != handler.getId()){
@@ -363,7 +365,7 @@ void Handlers::executionOrder() {
                 }
             }
         }
-    }
+    //}
 }
 
 int Handlers::checkPost (Relation r) const{ 
@@ -383,7 +385,7 @@ int Handlers::checkPost (Relation r) const{
 }
 
 int Handlers::checkEventDriven ()const {
-    Order o = getOrder(EO);
+    Order o = getOrder(PO);
     for (const Relation& r : o.getRelations()){
         if (r.getInstruction1().getType() == P){
             if (!checkPost(r)){

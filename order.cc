@@ -65,6 +65,15 @@ Message Order::initState(){
     return m;
 }
 
+int Order::existMessage(Message m){
+    for (const Relation& r: relations){
+        if (m.equal(r.getMessage1())){
+            return 1;
+        }
+    }
+    return 0;
+}
+
 Relation Order::getRelation(Message m){ //for execution order
     for (const Relation& r: relations){
         if (m.equal(r.getMessage1())){
@@ -80,7 +89,9 @@ Message Order::fusionMessages(){
     Relation relation = getRelation(m);
     for(int i = 1; i < relationsNumber(); i++ ){
         m = m.concatMessage(relation.getMessage2());
-        relation = getRelation(relation.getMessage2());
+        if (existMessage(m)){
+            relation = getRelation(relation.getMessage2());
+        }
     }
     // handler.addMessage(m);
     return m;

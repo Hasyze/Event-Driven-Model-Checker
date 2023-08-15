@@ -27,7 +27,7 @@ Message Message::concatMessage (Message m){
 
 int Message::existInstruction (Ins instruction) const{
     for (const Ins& ins : instructions){
-        if (ins.equal(instruction)){
+        if (ins.getVariable().equal(instruction.getVariable())){
             return 1;
         }
     }

@@ -12,13 +12,27 @@
 #include <ctime>
 using namespace std;
 
+int existIntruction(vector<Ins> instructions, Ins ins){
+    for (const Ins& instruction: instructions){
+        if (instruction.getVariable().equal(ins.getVariable()) && instruction.getType() == ins.getType()){
+            return 1;
+        }
+    }
+    return 0;
+}
+
 vector<Ins> generateWriteInstructions (vector<Variable> variables){
     srand(time(nullptr));
     vector <Ins> instructions;
-    int numberInstructions = 1 + rand() % 20;
+    int numberInstructions = 20;
     for (int i = 0; i<numberInstructions; i++){
         Variable variable = variables[rand()%variables.size()];
-        Ins instruction(W, variable, rand());
+        int value = rand()%100;
+        printf("value: %d\n", value);
+        Ins instruction(W, variable, value);
+        //while (!existIntruction(instructions, instruction)){
+            //Ins instruction(W, variable, rand()%100);
+        //}
         instructions.push_back(instruction);
     }
     return instructions;
@@ -37,15 +51,20 @@ int label = 0;
 
 vector<Ins> generateInstructions (vector<Ins> writeInstructions, vector<Ins> readInstructions){
     srand(time(nullptr));
-    int numberInstructions = 1 + rand () % 10;
+    int numberInstructions = 5;
     vector<Ins> instructions;
     for (int i = 0 ; i< numberInstructions; i++){
-        if (rand()%2 == 0){ //Post
-            Ins instruction(P, 1 + rand()%10, 1 + rand()%10, label);
+        int ins = rand()%2;
+        if (ins == 0){ //Post
+            // printf("post\n");
+            int handler_id = rand()%15;
+            int message_id = rand()%10 ;
+            Ins instruction(P, handler_id, message_id, label);
             instructions.push_back(instruction);
         } else { //Write or Read
             int index = rand() % writeInstructions.size();
-            if (rand()%2 == 0){ // Write
+            int wr = rand()%2;
+            if (wr == 0){ // Write
                 Ins instruction = writeInstructions[index];
                 instruction.addLabel(label);
                 instructions.push_back(instruction);
@@ -70,7 +89,7 @@ Message generateMessage (vector<Ins> writeInstructions, vector<Ins> readInstruct
 
 Handler generateHandler(int id, vector<Ins> writeInstructions, vector<Ins> readInstructions){
     srand(time(nullptr));
-    int numberMessages = 1 +rand() % 10;
+    int numberMessages = 5;
     Handler handler(id);
     for (int i = 0 ; i<numberMessages; i++){
         handler.addMessage(generateMessage(writeInstructions,readInstructions));
@@ -95,7 +114,7 @@ string generateRandomName(int length) {
 
 Handlers generateHandlers(){
     srand(time(nullptr));
-    int numberVariables = 1 + rand() % 5;
+    int numberVariables = 10;
     vector<Variable> variables;
     for (int i = 0; i < numberVariables; i++){
         int length = 1 + rand() % (1+i);
@@ -105,7 +124,7 @@ Handlers generateHandlers(){
     vector<Ins> writeInstructions = generateWriteInstructions(variables);
     vector<Ins> readInstructions = generateReadInstructions(writeInstructions);
     Handlers handlers(variables);
-    int numberHandlers = 1 + rand() % 10;
+    int numberHandlers = 15;
     for (int i=0;i<numberHandlers; i++){
         handlers.addHandler(generateHandler(i, writeInstructions, readInstructions ));
     }
@@ -113,10 +132,12 @@ Handlers generateHandlers(){
     for (vector<Ins>::size_type i = 0; i<writeInstructions.size(); i++){
         vector<Message> writeMessages = handlers.getMessages(writeInstructions[i]);
         vector<Message> readMessages = handlers.getMessages(readInstructions[i]);
+        // printf("read %ld\n", writeMessages.size());
         for (const Message& writeMessage: writeMessages){
             for (const Message& readMessage: readMessages){
                 Relation newRelation(writeMessage, writeInstructions[i],readMessage, readInstructions[i], writeInstructions[i].getVariable());
                 rf.addRelation(newRelation);
+                // printf("enter\n");
             }
         }
     }
@@ -279,8 +300,19 @@ int main(int argc, char** argv){
     // graph.cycle(H.messagesNumber());
 
     // H.checkEventDriven();
+    Graph gra({}, Order({}));
+
     if (argc != 3) {
-        printf("Too many/less arguments\n");
+       // printf("Too many/less arguments\n");
+       Handlers handlers = generateHandlers();
+       printf("%d\n",handlers.messagesNumber());
+       handlers.programOrder ();
+       handlers.executionOrder();
+       for (const Order& order: handlers.getOrders()){
+            gra.addOrder(order);
+        }
+        gra.cycle(handlers.messagesNumber());
+        handlers.checkEventDriven();
         exit(0);
     }
     Parser p (argv[1]) ;
@@ -292,12 +324,11 @@ int main(int argc, char** argv){
     orders.parserOrders(&ha);
     //printf("number orders %d\n", ha.ordersNumber());
 
-    Graph gra({}, Order({}));
 
     // graph.addOrder(po);
     ha.programOrder();
     ha.conflictOrder();
-    ha.executionOrder();
+    //ha.executionOrder();
 
     // graph.addOrder(co);
     
@@ -312,6 +343,7 @@ int main(int argc, char** argv){
     gra.cycle(ha.messagesNumber());
 
     ha.checkEventDriven();
+
     return 0;
 }
 

@@ -32,6 +32,7 @@ public:
     void setOrder(vector<Relation> newOrder);
     int relationsNumber() const;
     Message initState();
+    int existMessage(Message m);
     Relation getRelation(Message m);
     Message fusionMessages();
     //void conflictOrder ();
