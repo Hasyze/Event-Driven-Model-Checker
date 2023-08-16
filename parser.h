@@ -24,17 +24,13 @@ struct Node{
 class Parser {
 private:
     Node* contents;
-    //create node with malloc
 public:
     Parser(string filename);
-    // Parser(string filename);
     void insertNode(Node* head, string word);
     void print();
-    // Parser(vector<string> words);
     vector<string> splitContentFromFile(string filename);
     vector<string> splitContent(const string& content);
     int findInt (string content);
-    // Variable parserVariable (Node* content);
     Variable parserVariable ();
     vector<Variable> parserVariables ();
     Variable getVariable(vector<Variable> variables, string name);

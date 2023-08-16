@@ -46,58 +46,56 @@ void Graph::addOrder (Order order){
     }
 }
 
-int Graph::hasCycleInstruction(int v, int* visited, int* recursionStack) { //TODO
+int Graph::hasCycleInstruction(int v, int* visited, int* recursion) { 
     visited[v] = 1;
-    recursionStack[v] = 1;
+    recursion[v] = 1;
     for (const Relation& edge : edges.getRelations()){
         if (edge.getInstruction1().getLabel()==v) {
             int neighbor = edge.getInstruction2().getLabel();
-            if (!visited[neighbor] && hasCycleInstruction(neighbor, visited, recursionStack))
+            if (!visited[neighbor] && hasCycleInstruction(neighbor, visited, recursion))
                 return 1;
-            else if (recursionStack[neighbor])
+            else if (recursion[neighbor])
                 return 1;
         }
     }
-    recursionStack[v] = 0;
+    recursion[v] = 0;
     return 0;
 }
 
-int Graph::hasCycleMessage(int v, int* visited, int* recursionStack) { //TODO
-    visited[v] = 1;
-    recursionStack[v] = 1;
+int Graph::hasCycleMessage(int v, int* visited, int* recursion) { 
+    visited[v] = 1; //True
+    recursion[v] = 1;
     for (const Relation& edge : edges.getRelations()){
         if (edge.getMessage1().getId() == v && edge.getMessage1().getId() != edge.getMessage2().getId()){
             int neighbor = edge.getMessage2().getId();
-            if (!visited[neighbor] && hasCycleMessage(neighbor, visited, recursionStack))
+            if (!visited[neighbor] && hasCycleMessage(neighbor, visited, recursion))
                 return 1;
-            else if (recursionStack[neighbor])
+            else if (recursion[neighbor])
                 return 1;
         }
     }
-    recursionStack[v] = 0;
+    recursion[v] = 0;
     return 0;
 }
 
-int Graph::cycle (int nbMessages){  //TODO
+int Graph::cycle (int nbMessages){ 
     int* visitedInstruction = new int[vertex.size()];
-    int* recursionStackInstruction = new int[vertex.size()];
+    int* recursionInstruction = new int[vertex.size()];
     for (vector<Ins>::size_type i = 0; i < vertex.size(); i++) {
         visitedInstruction[i] = 0;
-        recursionStackInstruction[i] = 0;
+        recursionInstruction[i] = 0;
     }
     int* visitedMessage = new int[nbMessages];
-    int* recursionStackMessage = new int[nbMessages];
+    int* recursionMessage = new int[nbMessages];
     for (int i = 0; i < nbMessages; i++) {
         visitedMessage[i] = 0;
-        recursionStackMessage[i] = 0;
+        recursionMessage[i] = 0;
     }
     for (vector<Ins>::size_type i = 0; i < vertex.size(); i++) {
-        if ( hasCycleInstruction(i, visitedInstruction, recursionStackInstruction) &&
-        hasCycleMessage(i, visitedMessage, recursionStackMessage)) {
-            printf("NON VALID\n");
+        if ( hasCycleInstruction(i, visitedInstruction, recursionInstruction) &&
+        hasCycleMessage(i, visitedMessage, recursionMessage)) {
             return 1;
         }
     }
-    printf("VALID\n");
     return 0;
 }

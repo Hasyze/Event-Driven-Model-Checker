@@ -1,0 +1,37 @@
+Program 
+    Vars
+        begin
+        A = 0 ;
+        end
+
+    begin
+        Handler1
+
+            begin 
+
+                Message1
+
+                    begin
+                    0 : Write A 2 ;
+                    end
+
+                Message2
+
+                    begin 
+                    1 : Read A 1 ;
+                    end
+
+            end
+        Handler2
+
+
+            begin
+
+                Message3
+                    begin
+                    2 : Read A 2 ;
+                    3 : Write A 1 ;
+                    end
+
+            end
+    end

@@ -10,14 +10,12 @@ Parser::Parser(string filename) {
     vector<string> contents = splitContentFromFile(filename);
 
     if (contents.empty()) {
-        this->contents = nullptr; // Si le fichier est vide, la liste chaînée est vide
+        this->contents = nullptr; 
     } else {
-        // Créez le premier nœud de la liste chaînée
         this->contents = new Node;
         this->contents->word = contents[0];
         this->contents->next = nullptr;
 
-        // Insérez les mots suivants dans la liste chaînée
         Node* current = this->contents;
         for (size_t i = 1; i < contents.size(); i++) {
             Node* newNode = new Node;
@@ -30,26 +28,6 @@ Parser::Parser(string filename) {
     }
 }
 
-
-// Parser::Parser(string filename) {
-//     ifstream file(filename); 
-//     if (!file) {
-//         contents = nullptr;
-//         return;
-//     }
-
-//     stringstream buffer;
-//     buffer << file.rdbuf();
-//     string fileContent = buffer.str();
-
-//     istringstream iss(fileContent);
-//     string word;
-//     while (iss >> word) {
-        
-//         insertNode(contents, word);
-//     }
-// }
-
 void Parser::insertNode(Node* head, string word) {
     Node* newNode = new Node; 
     newNode->word = word;
@@ -58,13 +36,10 @@ void Parser::insertNode(Node* head, string word) {
         head = newNode;
         return;
     }
-    // cout << word << endl;
+
     Node* current = head;
-    // if (current-> next){
-        
-    // }
+
     while (current->next) {
-        printf("Problem\n");
         current = current->next;
     }
     current->next = newNode;
@@ -77,18 +52,11 @@ void Parser::print(){
     }
 }
 
-// Parser::Parser(vector<string> words) {
-//     contents = nullptr; 
-//     for (const string& word : words) {
-//         insertNode(contents, word); 
-//     }
-// }
 
-vector<string> Parser::splitContentFromFile(string filename) { //TODO
+vector<string> Parser::splitContentFromFile(string filename) { 
     vector<string> words;
     ifstream file(filename); 
     if (!file) {
-        //std::cerr << "Erreur lors de l'ouverture du fichier : " << filename << std::endl;
         return words; 
     }
 
@@ -104,7 +72,7 @@ vector<string> Parser::splitContentFromFile(string filename) { //TODO
     return words;
 }
 
-vector<string> Parser::splitContent(const string& content) { //TODO
+vector<string> Parser::splitContent(const string& content) {
     vector<string> words;
     istringstream iss(content);
 
@@ -124,27 +92,11 @@ int Parser::findInt (string content){
     return stoi(integer);
 }
 
-// Variable Parser::parserVariable (Node* contents){
-//     //cout << contents->word << endl;
-//     string name = contents->word;
-//     contents = contents->next;
-//     //cout << contents->word << endl;
-//     contents = contents->next;
-//     //cout << contents->word << endl;
-//     int value = stoi(contents->word);
-//     //printf("%d\n", value);
-//     return Variable(name,value);
-// }
-
 Variable Parser::parserVariable (){
-    //cout << contents->word << endl;
     string name = contents->word;
     contents = contents->next;
-    //cout << name << endl;
     contents = contents->next;
-    // cout << contents->word << endl;
     int value = stoi(contents->word);
-    //printf("%d\n", value);
     contents = contents->next;
     return Variable(name,value);
 }
@@ -158,10 +110,7 @@ vector<Variable> Parser::parserVariables (){
         }else if(enter){
             variables.push_back(parserVariable());
         }
-        //cout << contents->word << endl;
         contents = contents->next;
-        //cout << contents->word << endl;
-        //cout << contents->next->word << endl;
     }
     return variables;
 }
@@ -220,17 +169,8 @@ Message Parser::parserMessage (int id, vector<Variable> variables){
 
 Handler Parser::parserHandler (int id, vector<Variable> variables){
     Handler handler(id);
-    // vector<Variable> regs;
-    // int enterRegs = 0; 
     int enterMessage= 0;
     while (contents->word != "end"){
-        // if (contents->word == "Regs"){
-        //     enterRegs = 1;
-        // }// else if (enterRegs){
-        //     regs = parserVariables ();
-        //     // handler.setRegs(regs);
-        //     enterRegs = 0;
-        // }
         if (contents->word == "begin"){
             enterMessage = 1;
         }else if(enterMessage){
@@ -259,20 +199,13 @@ Handlers Parser::parserProgram (){
             enterHandler = 1;
         }else if(enterHandler){
             int id_h = findInt (contents->word);
-            // Handler h = parserHandler(id_h, variables);
-            // printf("%d\n", h.messagesNumber());
             handlers.addHandler(parserHandler(id_h, variables));
-            // printf("%d\n", handlers.handlersNumber());
         }
         contents = contents->next;
     }
     
     return handlers;
 }
-
-// Relation Parser::parserRelation (Handlers handlers, Node* contents){
-
-// }
 
 Name Parser::getNameFromString(string name){
     if (name == "PO"){
@@ -294,13 +227,9 @@ Order Parser::parserOrder(Name type, Handlers handlers){
     Order o (type);
     int enter = 0;
     while (contents && contents->word != "end"){
-        //cout << contents->next->word << endl;
-        
         if (contents->word == "begin"){
             enter = 1;
-            //cout << contents->next->word << endl;
         } else if(enter){
-            //printf("break\n");
             if (type == EO) {
                 Message message1 = handlers.getMessage(findInt(contents->word));
                 contents = contents->next;
@@ -309,13 +238,11 @@ Order Parser::parserOrder(Name type, Handlers handlers){
                 o.addRelation(newRelation);
                 contents = contents->next;
             } else {
-                // printf("break\n");
                 Ins instruction1 = handlers.getInstruction(stoi(contents->word));
                 Message message1 = handlers.getMessage(instruction1);
                 contents = contents->next;
                 Ins instruction2 = handlers.getInstruction(stoi(contents->word));
                 Message message2 = handlers.getMessage(instruction2);
-                // printf("break\n");
                 if (type == CO || type == RF){
                     Variable variable = instruction1.getVariable();
                     Relation newRelation(message1, instruction1, message2, instruction2, variable);

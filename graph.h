@@ -25,8 +25,8 @@ public:
     int existEdge (Relation relation) ;
     void addEdge (Relation r);
     void addOrder (Order order);
-    int hasCycleInstruction(int v, int* visited, int* recursionStack);
-    int hasCycleMessage(int v, int* visited, int* recursionStack);
+    int hasCycleInstruction(int v, int* visited, int* recursion);
+    int hasCycleMessage(int v, int* visited, int* recursion);
     int cycle (int nbMessages);
 };
 

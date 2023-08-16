@@ -13,21 +13,14 @@ class Handler {
 private:
     int id_m;
     vector<Message> messages; 
-    //vector<Variable> regs;
 
 public:
     Handler (int id);
     Handler (int id, vector<Message> m);
-    //Handler (int id, vector<Message>m, vector<Variable> r);
     int getId() const {return id_m;}
     vector<Message> getMessages() const { return this->messages;}
-    // vector<Variable> getRegs() const { return this->regs;}
     void addMessage (Message m);
-    // void setMessages (vector<Message> m);
     int messagesNumber () const;
-    //void setRegs (vector<Variable> v);
-   // void addReg (Variable v);
-    //int regsNumber () const;
     int existMessage(Message m) const;
     int existMessage(Ins instruction) const;
     int existMessage(int id) const;

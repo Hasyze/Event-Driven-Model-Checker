@@ -43,7 +43,7 @@ public:
     vector<Message> getMessages(Ins instruction) const;
     Ins getInstruction (int label) const;
     Order getExecutionOrderHandler (Handler h);
-    void conflictOrder ();
+    void ReadFrom ();
     vector<Relation> messageRelations(Message message) const;
     void programOrder ();
     int idHandler(Message m) const;

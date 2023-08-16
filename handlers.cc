@@ -141,7 +141,8 @@ Order Handlers::getExecutionOrderHandler (Handler h){
     return newOrder;
 }
 
-void Handlers::conflictOrder (){ //just add co + check others
+void Handlers::ReadFrom (){ 
+    //Construct missing read-from relations based on the conslict order
     Order rf = getOrder(RF);
     Order co = getOrder(CO); 
     for (const Relation& r : co.getRelations()){
@@ -245,27 +246,18 @@ Order Handlers::executionOrderHandler(Handler h){
     return newOrder;
 }
 
-void Handlers::addExecutionRelation (Order* eo, Order order, Handler handler, Message m){
+void Handlers::addExecutionRelation (Order* eo, Order order, Handler handler, Message m){ //Construct the execution order of handler
     vector<Relation> sources = Source(order, handler, m);
-    //printf("orders sources: %ld\n", sources.size());
     vector<Relation> destinations = Destination(order, handler, m);
-    //printf("orders destinations: %ld\n\n", destinations.size());
     for (const Relation& source: sources){
         for(const Relation& destination: destinations){
-            // printf("message source id: %d\n", source.getMessage1().getId());
-            // printf("message destination id: %d\n", destination.getMessage1().getId());
             int labelSource = source.getInstruction1().getLabel();
             int labelDestination = destination.getInstruction2().getLabel();
             if (labelSource > labelDestination){
                 Relation newRelation (destination.getMessage1(),source.getMessage2());
                 eo->addRelation(newRelation);
             }
-            // printf("%d\n", labelSource);
-            // printf("%d\n", labelDestination);
-            // printf("value s: %d\n", source.getVariable().getValue());
-            // printf("value d: %d\n", destination.getVariable().getValue());
             if (labelSource < labelDestination && source.getVariable().getName()==destination.getVariable().getName()){
-                // printf("Yes\n");
                 Relation newRelation (source.getMessage2(),destination.getMessage1());
                 eo->addRelation(newRelation);
             }
@@ -281,63 +273,29 @@ int Handlers::numberExecutionOrder() const{
     return number;
 }
 
-void Handlers::executionOrder() {
-    Order rf = getOrder(RF);
-    Order co = getOrder(CO); 
-    printf("orders rf: %d\n", rf.relationsNumber());
-    Order eo(EO);
-    for (const Handler& h: handlers){
-        for(const Message& m: h.getMessages()){
-            vector<Relation> rfRelations = getRelations(rf,m);
-            eo.addRelations(rfRelations);
-            vector<Relation> coRelations = getRelations(co,m);
-            eo.addRelations(coRelations);
+void Handlers::executionOrder() { //construct the execution order
+    if (numberExecutionOrder() != getOrder(EO).relationsNumber() ){
+        Order rf = getOrder(RF);
+        Order co = getOrder(CO); 
+        Order eo(EO);
+        for (const Handler& h: handlers){
+            for(const Message& m: h.getMessages()){
+                vector<Relation> rfRelations = getRelations(rf,m);
+                eo.addRelations(rfRelations);
+                vector<Relation> coRelations = getRelations(co,m);
+                eo.addRelations(coRelations);
+            }
         }
-    }
-    for (const Handler& h: handlers){
-        for (const Handler& handler: handlers){
-            if(h.getId() != handler.getId()){
-                for (const Message& m: h.getMessages()){
-                    addExecutionRelation (&eo, rf, handler, m);
-                    addExecutionRelation (&eo, co, handler, m);
-                //     vector<Relation> sourcesRF = Source(rf, handler, m);
-                //     vector<Relation> destinationsRF = Destination(rf, handler, m);
-                //     for (const Relation& source: sourcesRF){
-                //         for(const Relation& destination: destinationsRF){
-                //             int labelSource = source.getInstruction1().getLabel();
-                //             int labelDestination = destination.getInstruction2().getLabel();
-                //             if (labelSource < labelDestination){
-                //                 Relation newRelation (destination.getMessage1(),source.getMessage2());
-                //                 eo.addRelation(newRelation);
-                //             }
-                //             if (labelSource > labelDestination && source.getVariable().equal(destination.getVariable())){
-                //                 Relation newRelation (source.getMessage2(),destination.getMessage1());
-                //                 eo.addRelation(newRelation);
-                //             }
-                //         }
-                //     }
-                //     vector<Relation> sourcesCO = Source(co, handler, m);
-                //     vector<Relation> destinationsCO = Destination(co, handler, m);
-                //     for (const Relation& source: sourcesCO){
-                //         for(const Relation& destination: destinationsCO){
-                //             int labelSource = source.getInstruction1().getLabel();
-                //             int labelDestination = destination.getInstruction2().getLabel();
-                //             if (labelSource > labelDestination){
-                //                 Relation newRelation (destination.getMessage1(),source.getMessage2());
-                //                 eo.addRelation(newRelation);
-                //             }
-                //             if (labelSource < labelDestination && source.getVariable().equal(destination.getVariable())){
-                //                 Relation newRelation (source.getMessage2(),destination.getMessage1());
-                //                 eo.addRelation(newRelation);
-                //             }
-                //         }
-                //     }
+        for (const Handler& h: handlers){
+            for (const Handler& handler: handlers){
+                if(h.getId() != handler.getId()){
+                    for (const Message& m: h.getMessages()){
+                        addExecutionRelation (&eo, rf, handler, m);
+                        addExecutionRelation (&eo, co, handler, m);
+                    }
                 }
             }
         }
-    }
-    printf("orders eo: %d\n", eo.relationsNumber());
-    //if (numberExecutionOrder() != eo.relationsNumber()){
         for (const Handler& h: handlers){
             for (const Handler& handler: handlers){
                 if(h.getId() != handler.getId()){
@@ -346,26 +304,10 @@ void Handlers::executionOrder() {
                         Message messageFusion = newOrder.fusionMessages();
                         addExecutionRelation (&eo, newOrder, handler, messageFusion);
                     }
-                    // vector<Relation> sourcesEO = Source(newOrder, handler, messageFusion);
-                    // vector<Relation> destinationsEO = Destination(newOrder, handler, messageFusion);
-                    // for (const Relation& source: sourcesEO){
-                    //     for(const Relation& destination: destinationsEO){
-                    //         int labelSource = source.getInstruction1().getLabel();
-                    //         int labelDestination = destination.getInstruction2().getLabel();
-                    //         if (labelSource > labelDestination){
-                    //             Relation newRelation (destination.getMessage1(),source.getMessage2());
-                    //             eo.addRelation(newRelation);
-                    //         }
-                    //         if (labelSource < labelDestination && source.getVariable().equal(destination.getVariable())){
-                    //             Relation newRelation (source.getMessage2(),destination.getMessage1());
-                    //             eo.addRelation(newRelation);
-                    //         }
-                    //     }
-                    // }
                 }
             }
         }
-    //}
+    }
 }
 
 int Handlers::checkPost (Relation r) const{ 
@@ -389,11 +331,9 @@ int Handlers::checkEventDriven ()const {
     for (const Relation& r : o.getRelations()){
         if (r.getInstruction1().getType() == P){
             if (!checkPost(r)){
-                printf("Non Valid!\n");
                 return 0;
             }
         }
     }
-    printf("Valid!\n");
     return 1;
 }

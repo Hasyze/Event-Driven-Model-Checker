@@ -21,10 +21,8 @@ private:
 
 public:
     Order (Name t);
-    Order (vector<Relation> r); //COMMENT
     Order (vector<Relation> r, Name t);
     vector<Relation> getRelations () const;;
-    // vector<Relation> getRelations(Message m) const;
     Name getType() const;
     int existRelation(Relation r) const;
     void addRelation (Relation r) ;
@@ -35,8 +33,6 @@ public:
     int existMessage(Message m);
     Relation getRelation(Message m);
     Message fusionMessages();
-    //void conflictOrder ();
-    //int checkEventDriven (Handlers H);
 };
 
 #endif

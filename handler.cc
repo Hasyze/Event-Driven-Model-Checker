@@ -6,33 +6,13 @@ Handler::Handler (int id): id_m(id), messages({}) {}
 
 Handler::Handler (int id, vector<Message> m): id_m(id), messages(m) {}
 
-// Handler::Handler (int id, vector<Message>m, vector<Variable> r): id_m(id), messages(m), regs(r){}
-
 void Handler::addMessage (Message m) {
     messages.push_back(m);
 }
 
-// void Handler::setMessages (vector<Message> m){
-//     for(const Message& message: m){
-//         addMessages(message);
-//     }
-// }
-
 int Handler::messagesNumber () const {
     return messages.size();
 }
-
-// void Handler::setRegs (vector<Variable> v){
-//     regs = v;
-// }
-
-// void Handler::addReg (Variable v) {
-//     regs.push_back(v);
-// }
-
-// int Handler::regsNumber () const {
-//     return regs.size();
-// }
 
 int Handler::existMessage(Message m) const{
     for(const Message& message: messages){
